@@ -1,6 +1,6 @@
 id = "ronzyfonzy.herdr-notes"
 name = "notes"
-version = "0.1.0"
+version = "0.1.1"
 # Developed and tested against 0.9.1.
 min_herdr_version = "0.9.1"
 description = "Per-tab Markdown notes in a side pane, stored next to the Claude Code session. Agents read and edit the same file."

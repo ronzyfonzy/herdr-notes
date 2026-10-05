@@ -9,7 +9,9 @@ if [ -s "$state" ]; then
   if herdr pane get "$id" >/dev/null 2>&1; then herdr pane close "$id"; exit; fi
 fi
 f=$(sh "$here/notes-path.sh") || exit 1
+# target the caller's own pane, not whichever workspace happens to be focused
 out=$(herdr plugin pane open --plugin "${HERDR_PLUGIN_ID:-ronzyfonzy.herdr-notes}" --entrypoint notes \
+  ${HERDR_PANE_ID:+--target-pane "$HERDR_PANE_ID"} \
   --placement split --direction right --cwd "${PWD:-$HOME}" --env "HERDR_NOTES_FILE=$f" --focus) || exit 1
 printf '%s' "$out" | grep -o '"pane_id":"[^"]*"' | head -1 | cut -d'"' -f4 > "$state"
 # a fresh split is 50/50; shrink the notes pane to HERDR_NOTES_WIDTH (fraction of the tab, default 1/3)

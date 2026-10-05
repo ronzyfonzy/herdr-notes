@@ -63,7 +63,7 @@ herdr plugin link /path/to/herdr-notes
 sh test/run.sh      # stubs `herdr` in a throwaway HOME; no running herdr needed
 ```
 
-Tested on herdr 0.9.1.
+Tested on herdr 0.9.1. Pane `width` in the manifest is popup-only in herdr, so the 1/3 split is done by resizing after opening.
 
 ## License
 

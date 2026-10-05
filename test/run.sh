@@ -2,6 +2,7 @@
 # Runs notes-path.sh and setup.sh against a stubbed `herdr` in a throwaway HOME. Exit 0 = all pass.
 root=$(cd "$(dirname "$0")/.." && pwd)
 tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
+unset HERDR_BIN_PATH HERDR_PLUGIN_STATE_DIR HERDR_PANE_ID HERDR_TAB_ID
 export HOME="$tmp/home" HERDR_PLUGIN_ROOT="$root" HERDR_PLUGIN_ID=test.herdr-notes
 mkdir -p "$tmp/bin" "$HOME/.claude/projects/proj" "$HOME/.config/herdr"
 touch "$HOME/.claude/projects/proj/S1.jsonl" "$HOME/.claude/projects/proj/S2.jsonl"

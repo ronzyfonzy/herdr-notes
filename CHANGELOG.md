@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2
+- Call herdr through `HERDR_BIN_PATH` when set.
+- Keep open-pane tracking files in `HERDR_PLUGIN_STATE_DIR`.
+
 ## 0.1.1
 - Open the notes pane next to the caller's own pane, not in whichever workspace is focused.
 - Reload the file in vim every second so edits by agents show up while the pane is unfocused.

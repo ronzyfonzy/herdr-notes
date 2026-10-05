@@ -2,7 +2,7 @@
 # Close this tab's notes pane if open, else open it as a right split.
 here=$(cd "$(dirname "$0")" && pwd)
 . "$here/need.sh"; need python3
-state="${HERDR_NOTES_DIR:-$HOME/.local/state/herdr/notes}/.pane-$(printf %s "$HERDR_TAB_ID" | tr -c 'A-Za-z0-9\n' _)"
+state="${HERDR_PLUGIN_STATE_DIR:-$HOME/.local/state/herdr/notes}/.pane-$(printf %s "$HERDR_TAB_ID" | tr -c 'A-Za-z0-9\n' _)"
 mkdir -p "$(dirname "$state")"
 if [ -s "$state" ]; then
   id=$(cat "$state"); rm -f "$state"

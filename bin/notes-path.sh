@@ -11,7 +11,7 @@ ws_id, tab_id, pane_id = (env.get(k, "") for k in ("HERDR_WORKSPACE_ID", "HERDR_
 
 def herdr(*args):
     try:
-        out = subprocess.run(("herdr",) + args, capture_output=True, text=True).stdout
+        out = subprocess.run((env.get("HERDR_BIN_PATH") or "herdr",) + args, capture_output=True, text=True).stdout
         return json.loads(out)["result"]
     except Exception:
         return {}

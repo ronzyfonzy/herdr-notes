@@ -8,6 +8,7 @@ exec python3 - "$@" <<'PY'
 import os, re, shutil, subprocess, sys
 
 mode = sys.argv[1]
+HERDR = os.environ.get("HERDR_BIN_PATH") or "herdr"
 pid = os.environ.get("HERDR_PLUGIN_ID", "ronzyfonzy.herdr-notes")
 root = os.environ["HERDR_PLUGIN_ROOT"]
 cfg = os.environ.get("HERDR_NOTES_CONFIG") or os.path.expanduser("~/.config/herdr/config.toml")
@@ -57,8 +58,8 @@ else:
         os.remove(link)
         msgs.append(f"removed {link}")
 
-subprocess.run(["herdr", "server", "reload-config"], capture_output=True)
+subprocess.run([HERDR, "server", "reload-config"], capture_output=True)
 out = "; ".join(msgs) or "nothing to do"
 print(out)
-subprocess.run(["herdr", "notification", "show", f"herdr-notes {mode}", "--body", out], capture_output=True)
+subprocess.run([HERDR, "notification", "show", f"herdr-notes {mode}", "--body", out], capture_output=True)
 PY

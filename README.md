@@ -19,7 +19,7 @@ Requires `python3` and an editor (`vim` by default). macOS and Linux.
 
 ## Use
 
-- `prefix+shift+n`: open the notes pane for the current tab; press again to close it.
+- `prefix+shift+n`: open the notes pane for the current tab, docked on the right. If it is open but not focused, the key focuses it; if it is focused, the key closes it (unsaved keystrokes are written first).
 - Tell Claude "read my notes". Claude runs `herdr-notes-path` from its own pane, which prints the file for its tab.
   Put this in `~/.claude/CLAUDE.md` so every session knows:
 
@@ -32,7 +32,7 @@ Requires `python3` and an editor (`vim` by default). macOS and Linux.
 
   Use `herdr-notes-path` rather than `herdr plugin action invoke path`: the action resolves against
   whichever workspace is *focused*, not the caller's.
-- vi-family editors reload automatically when an agent edits the file (checked about once a second).
+- vi-family editors reload automatically when an agent edits the file (checked about once a second) and autosave while you type (after 2 seconds idle or on change). Markdown syntax highlighting and conceal are on.
 
 ## Where notes live
 
@@ -63,7 +63,7 @@ herdr plugin link /path/to/herdr-notes
 sh test/run.sh      # stubs `herdr` in a throwaway HOME; no running herdr needed
 ```
 
-Tested on herdr 0.9.1. Pane `width` in the manifest is popup-only in herdr, so the 1/3 split is done by resizing after opening.
+Tested on herdr 0.9.1. Pane `width` in the manifest is popup-only in herdr, so the 1/3 width is set with `pane split --ratio` (the ratio is the original pane's share).
 
 ## License
 

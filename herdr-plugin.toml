@@ -1,6 +1,6 @@
 id = "ronzyfonzy.herdr-notes"
 name = "notes"
-version = "0.2.0"
+version = "0.3.0"
 # Developed and tested against 0.9.1.
 min_herdr_version = "0.9.1"
 description = "Per-tab Markdown notes in a side pane, stored next to the Claude Code session. Agents read and edit the same file."
@@ -26,12 +26,12 @@ command = ["sh", "bin/notes-path.sh"]
 
 [[actions]]
 id = "setup"
-title = "notes: install keybinding and the herdr-notes-path command"
+title = "notes: install keybinding, herdr-notes command and Claude skill"
 contexts = ["workspace"]
 command = ["sh", "bin/setup.sh", "install"]
 
 [[actions]]
 id = "uninstall"
-title = "notes: remove keybinding and the herdr-notes-path command"
+title = "notes: remove keybinding, herdr-notes command and Claude skill"
 contexts = ["workspace"]
 command = ["sh", "bin/setup.sh", "uninstall"]

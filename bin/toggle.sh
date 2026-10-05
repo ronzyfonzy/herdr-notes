@@ -3,6 +3,7 @@
 # A stored pane only counts if herdr still reports it with our label, so a stale id is never closed or focused.
 here=$(cd "$(dirname "$0")" && pwd)
 . "$here/need.sh"; need python3
+. "$here/config.sh"
 . "$here/editor.sh"
 label=notes
 dir=${HERDR_PLUGIN_STATE_DIR:-$HOME/.local/state/herdr/notes}

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0
+- `herdr-notes read | append | path` commands for agents; `herdr-notes-path` kept as an alias. `setup` now installs them as small wrapper scripts, so they keep working across plugin updates once `setup` is re-run.
+- Claude Code skill (`skills/notes`) linked by `setup`, replacing the manual CLAUDE.md snippet.
+- `config.toml` in the plugin config dir (width, editor, key, notes_dir, new_session); environment variables still override.
+- `new_session = "carry"` starts a new Claude session in the same tab with a copy of the tab's previous note (default `blank`).
+- Documented that Claude Code's cleanup does not delete `*.notes.md`.
+
 ## 0.2.0
 - Toggle is now open / focus / close: pressing it while the notes pane is open but unfocused focuses it; pressing it while focused closes it.
 - The notes pane is identified by label, so a stale or reused pane id is never closed or focused.

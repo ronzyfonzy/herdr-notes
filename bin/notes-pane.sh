@@ -2,6 +2,7 @@
 # Editor on the notes file. HERDR_NOTES_EDITOR > $EDITOR > vim.
 # vi-family: autosave (2s idle / on change) and reload when an agent edits the file.
 here=$(cd "$(dirname "$0")" && pwd)
+. "$here/config.sh"
 . "$here/editor.sh"
 f=${HERDR_NOTES_FILE:-$(sh "$here/notes-path.sh")} || { printf 'press enter\n'; read _; exit 1; }
 if ! command -v "${ed%% *}" >/dev/null 2>&1; then

@@ -3,6 +3,7 @@
 # Never overwrites an occupied key; backs up config.toml before the first write.
 here=$(cd "$(dirname "$0")" && pwd)
 . "$here/need.sh"; need python3
+. "$here/config.sh"
 export HERDR_PLUGIN_ROOT="${HERDR_PLUGIN_ROOT:-$(dirname "$here")}"
 exec python3 - "$@" <<'PY'
 import os, re, shutil, subprocess, sys
@@ -13,8 +14,12 @@ pid = os.environ.get("HERDR_PLUGIN_ID", "ronzyfonzy.herdr-notes")
 root = os.environ["HERDR_PLUGIN_ROOT"]
 cfg = os.environ.get("HERDR_NOTES_CONFIG") or os.path.expanduser("~/.config/herdr/config.toml")
 key = os.environ.get("HERDR_NOTES_KEY", "prefix+shift+n")
-link = os.path.expanduser("~/.local/bin/herdr-notes-path")
-target = os.path.join(root, "bin", "notes-path.sh")
+bindir = os.path.expanduser("~/.local/bin")
+notes_sh = os.path.join(root, "bin", "notes.sh")
+MARK = "# managed by ronzyfonzy.herdr-notes setup"
+wrappers = {"herdr-notes": f'exec sh "{notes_sh}" "$@"', "herdr-notes-path": f'exec sh "{notes_sh}" path'}
+skill_link = os.path.expanduser("~/.claude/skills/herdr-notes")
+skill_src = os.path.join(root, "skills", "notes")
 msgs = []
 
 text = open(cfg).read() if os.path.exists(cfg) else ""
@@ -42,21 +47,38 @@ description = "notes: toggle side pane"
         os.makedirs(os.path.dirname(cfg), exist_ok=True)
         open(cfg, "w").write(new)
         msgs.append(f"bound {key} -> {pid}.toggle")
-    os.makedirs(os.path.dirname(link), exist_ok=True)
-    if os.path.islink(link) or not os.path.exists(link):
-        if os.path.islink(link):
-            os.remove(link)
-        os.symlink(target, link)
-        msgs.append(f"linked {link}")
+    os.makedirs(bindir, exist_ok=True)
+    for name, body in wrappers.items():
+        w = os.path.join(bindir, name)
+        ours = (os.path.islink(w) and os.readlink(w).endswith("bin/notes-path.sh")) or (os.path.isfile(w) and MARK in open(w).read())
+        if os.path.exists(w) or os.path.islink(w):
+            if not ours:
+                msgs.append(f"{w} exists and is not ours; left untouched")
+                continue
+            os.remove(w)
+        open(w, "w").write(f"#!/bin/sh\n{MARK}\n{body}\n")
+        os.chmod(w, 0o755)
+        msgs.append(f"installed {w}")
+    os.makedirs(os.path.dirname(skill_link), exist_ok=True)
+    if os.path.islink(skill_link) and (os.readlink(skill_link).endswith("skills/notes") or not os.path.exists(skill_link)):
+        os.remove(skill_link)  # ours from an earlier install path, or dangling
+    if os.path.exists(skill_link):
+        msgs.append(f"{skill_link} exists and is not ours; left untouched")
     else:
-        msgs.append(f"{link} exists and is not a symlink; left untouched")
+        os.symlink(skill_src, skill_link)
+        msgs.append(f"linked skill {skill_link}")
 else:
     if rest != text:
         open(cfg, "w").write(rest)
         msgs.append(f"removed keybinding block from {cfg}")
-    if os.path.islink(link) and os.readlink(link) == target:
-        os.remove(link)
-        msgs.append(f"removed {link}")
+    for name in wrappers:
+        w = os.path.join(bindir, name)
+        if os.path.isfile(w) and MARK in open(w).read():
+            os.remove(w)
+            msgs.append(f"removed {w}")
+    if os.path.islink(skill_link) and os.readlink(skill_link) == skill_src:
+        os.remove(skill_link)
+        msgs.append(f"removed {skill_link}")
 
 subprocess.run([HERDR, "server", "reload-config"], capture_output=True)
 out = "; ".join(msgs) or "nothing to do"

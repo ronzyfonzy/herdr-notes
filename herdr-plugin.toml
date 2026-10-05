@@ -1,0 +1,37 @@
+id = "ronzyfonzy.herdr-notes"
+name = "notes"
+version = "0.1.0"
+# Developed and tested against 0.9.1.
+min_herdr_version = "0.9.1"
+description = "Per-tab Markdown notes in a side pane, stored next to the Claude Code session. Agents read and edit the same file."
+platforms = ["macos", "linux"]
+
+[[panes]]
+id = "notes"
+title = "notes"
+placement = "split"
+command = ["sh", "-c", "exec sh \"$HERDR_PLUGIN_ROOT/bin/notes-pane.sh\""]
+
+[[actions]]
+id = "toggle"
+title = "notes: toggle side pane"
+contexts = ["workspace", "pane"]
+command = ["sh", "bin/toggle.sh"]
+
+[[actions]]
+id = "path"
+title = "notes: print notes file path (of the focused tab)"
+contexts = ["workspace", "pane"]
+command = ["sh", "bin/notes-path.sh"]
+
+[[actions]]
+id = "setup"
+title = "notes: install keybinding and the herdr-notes-path command"
+contexts = ["workspace"]
+command = ["sh", "bin/setup.sh", "install"]
+
+[[actions]]
+id = "uninstall"
+title = "notes: remove keybinding and the herdr-notes-path command"
+contexts = ["workspace"]
+command = ["sh", "bin/setup.sh", "uninstall"]

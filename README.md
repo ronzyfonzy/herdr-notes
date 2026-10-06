@@ -13,13 +13,13 @@ herdr plugin action invoke setup --plugin ronzyfonzy.herdr-notes
 
 `setup`:
 - binds `prefix+shift+n` to the toggle (never overwriting an occupied key; `config.toml` is backed up once
-  to `config.toml.herdr-notes-backup`),
+  to `config.toml.herdr-notes-backup`), and the preview toggle too if `preview_key` is set (see Configuration),
 - installs the `herdr-notes` and `herdr-notes-path` commands in `~/.local/bin`,
 - links the Claude Code skill at `~/.claude/skills/herdr-notes`.
 
 `uninstall` reverses all three. Run `setup` again after updating the plugin (the install path changes).
 
-Requires `python3` and an editor (`vim` by default). macOS and Linux.
+Requires `python3` and an editor (`vim` by default). `glow` is optional (preview only). macOS and Linux.
 
 ## Use
 

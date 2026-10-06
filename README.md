@@ -28,7 +28,7 @@ Requires `python3` and an editor (`vim` by default). `glow` is optional (preview
 - vi-family editors reload when an agent edits the file (checked about once a second) and autosave while you
   type (after 2 seconds idle or on change). Markdown syntax highlighting and conceal are on.
 - Preview (opt-in): set `preview_key` and run `setup`; that key toggles a read-only rendered view of the same
-  note in its own pane (open / focus / close, like the notes pane). It uses [glow](https://github.com/charmbracelet/glow)
+  note in its own pane (the key opens it and closes it again from anywhere). It uses [glow](https://github.com/charmbracelet/glow)
   and redraws within a second when the file changes. Without glow it opens the editor read-only instead.
   Output taller than the pane scrolls off the top; use the pane's scrollback.
 

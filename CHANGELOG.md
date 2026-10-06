@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.4.1
+- The preview key now closes the preview pane whether or not it is focused (it no longer re-focuses it).
+
 ## 0.4.0
 - `preview` action: a read-only rendered view of the tab's note in its own pane, toggled like the notes pane. Rendered with glow, redrawn when the file changes; falls back to the editor (read-only) when glow is not installed.
 - `preview_key` binds it via `setup` (opt-in, never overwrites an occupied key); `viewer` picks the renderer.

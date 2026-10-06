@@ -2,7 +2,7 @@
 # Runs notes-path.sh, toggle.sh and setup.sh against a stubbed `herdr` in a throwaway HOME. Exit 0 = all pass.
 root=$(cd "$(dirname "$0")/.." && pwd)
 tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
-unset HERDR_PLUGIN_CONFIG_DIR HERDR_NOTES_DIR HERDR_NOTES_WIDTH HERDR_NOTES_NEW_SESSION HERDR_BIN_PATH HERDR_PLUGIN_STATE_DIR HERDR_PANE_ID HERDR_TAB_ID HERDR_NOTES_FILE HERDR_NOTES_EDITOR EDITOR
+unset HERDR_PLUGIN_CONFIG_DIR HERDR_NOTES_DIR HERDR_NOTES_WIDTH HERDR_NOTES_NEW_SESSION HERDR_BIN_PATH HERDR_PLUGIN_STATE_DIR HERDR_PANE_ID HERDR_TAB_ID HERDR_NOTES_FILE HERDR_NOTES_EDITOR HERDR_NOTES_PREVIEW_KEY HERDR_NOTES_VIEWER HERDR_NOTES_MODE EDITOR
 export HOME="$tmp/home" HERDR_PLUGIN_ROOT="$root" HERDR_PLUGIN_ID=test.herdr-notes STUB_LOG="$tmp/calls"
 mkdir -p "$tmp/bin" "$HOME/.claude/projects/proj" "$HOME/.config/herdr"
 touch "$HOME/.claude/projects/proj/S1.jsonl" "$HOME/.claude/projects/proj/S2.jsonl" "$HOME/.claude/projects/proj/S3.jsonl" "$HOME/.claude/projects/proj/S4.jsonl"
@@ -86,7 +86,34 @@ check "missing pane: opens a new one"          yes "$(called 'pane split')"
 mkdir "$HERDR_PLUGIN_STATE_DIR/.lock-w1_t1"; date +%s > "$HERDR_PLUGIN_STATE_DIR/.lock-w1_t1/t"; rm -f "$st"; toggle
 check "lock held: second press is a no-op"     no "$(called 'pane split')"
 rm -rf "$HERDR_PLUGIN_STATE_DIR/.lock-w1_t1"
+
+# preview: own label and state, same dock logic, passes the mode to the pane
+pst=$HERDR_PLUGIN_STATE_DIR/.pane-w1_t1-preview
+ptoggle() { : > "$STUB_LOG"; sh "$root/bin/toggle.sh" preview; }
+rm -f "$st"; ptoggle
+check "preview: labels the pane"        yes "$(called 'pane rename w1:pNEW notes-preview')"
+check "preview: passes mode to the pane" yes "$(called 'HERDR_NOTES_MODE=preview')"
+check "preview: own state file"          "w1:pNEW|no" "$(cat "$pst")|$([ -e "$st" ] && echo yes || echo no)"
+(STUB_EXISTS=1; STUB_LABEL=notes-preview; STUB_FOCUSED=true; export STUB_EXISTS STUB_LABEL STUB_FOCUSED; ptoggle)
+check "preview: focused -> closes"       yes "$(called 'pane close w1:pNEW')"
+(STUB_EXISTS=1; STUB_LABEL=notes; STUB_FOCUSED=false; export STUB_EXISTS STUB_LABEL STUB_FOCUSED; ptoggle)
+check "preview: notes pane is not a preview pane" yes "$(called 'pane split')"
+rm -f "$pst"
 unset HERDR_PLUGIN_STATE_DIR HERDR_TAB_ID HERDR_PANE_ID
+
+# preview pane: glow when present, read-only editor otherwise
+pv=$tmp/note.md; printf '# hi\n' > "$pv"; mkdir -p "$tmp/fake"
+printf '#!/bin/sh\necho "glow-ran $*"; exit 0\n' > "$tmp/fake/glow"; chmod +x "$tmp/fake/glow"
+printf '#!/bin/sh\necho "ed-ran $*"\n' > "$tmp/fake/fakevim"; chmod +x "$tmp/fake/fakevim"
+printf '#!/bin/sh\nexit 0\n' > "$tmp/fake/tput"; chmod +x "$tmp/fake/tput"
+PATH="$tmp/fake:$PATH" HERDR_NOTES_MODE=preview HERDR_NOTES_FILE=$pv sh "$root/bin/notes-pane.sh" > "$tmp/glow.out" 2>&1 &
+gp=$!; sleep 2; kill $gp 2>/dev/null; wait $gp 2>/dev/null; out=$(cat "$tmp/glow.out")
+check "preview: glow renders the file"   yes "$(echo "$out" | grep -q "glow-ran.*note.md" && echo yes || echo no)"
+out=$(HERDR_NOTES_VIEWER=fakevim PATH="$tmp/fake:$PATH" HERDR_NOTES_MODE=preview HERDR_NOTES_FILE=$pv sh "$root/bin/notes-pane.sh" 2>&1)
+check "preview: other viewer runs on the file" yes "$(echo "$out" | grep -q "ed-ran.*note.md" && echo yes || echo no)"
+rm -f "$tmp/fake/glow"
+out=$(HERDR_NOTES_EDITOR=fakevim PATH="$tmp/fake:/usr/bin:/bin" HERDR_NOTES_MODE=preview HERDR_NOTES_FILE=$pv sh "$root/bin/notes-pane.sh" 2>&1)
+check "preview: no glow -> falls back to the editor" yes "$(echo "$out" | grep -q "ed-ran.*note.md" && echo yes || echo no)"
 
 cfg=$HOME/.config/herdr/config.toml
 sh "$root/bin/setup.sh" install >/dev/null; sh "$root/bin/setup.sh" install >/dev/null
@@ -94,6 +121,10 @@ check "setup idempotent (1 block)" 1 "$(grep -c '^# BEGIN test.herdr-notes' "$cf
 check "herdr-notes wrapper"        yes "$(grep -q "$root/bin/notes.sh" "$HOME/.local/bin/herdr-notes" && [ -x "$HOME/.local/bin/herdr-notes" ] && echo yes || echo no)"
 check "herdr-notes-path wrapper"   "$P/S1.notes.md" "$(HERDR_PANE_ID=w1:p1 HERDR_TAB_ID=w1:t1 "$HOME/.local/bin/herdr-notes-path")"
 check "skill linked"               "$root/skills/notes" "$(readlink "$HOME/.claude/skills/herdr-notes")"
+check "no preview key unless configured" 0 "$(grep -c '\.preview' "$cfg")"
+sh "$root/bin/setup.sh" uninstall >/dev/null
+HERDR_NOTES_PREVIEW_KEY=prefix+n sh "$root/bin/setup.sh" install >/dev/null
+check "preview_key binds the preview action" 1 "$(grep -c 'test.herdr-notes.preview' "$cfg")"
 sh "$root/bin/setup.sh" uninstall >/dev/null
 check "uninstall removes block"    0 "$(grep -c 'herdr-notes' "$cfg")"
 check "uninstall removes wrappers" no "$([ -e "$HOME/.local/bin/herdr-notes" ] || [ -e "$HOME/.local/bin/herdr-notes-path" ] && echo yes || echo no)"

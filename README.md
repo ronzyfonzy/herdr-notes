@@ -27,6 +27,10 @@ Requires `python3` and an editor (`vim` by default). macOS and Linux.
   focused, the key focuses it; if it is focused, the key closes it (unsaved keystrokes are written first).
 - vi-family editors reload when an agent edits the file (checked about once a second) and autosave while you
   type (after 2 seconds idle or on change). Markdown syntax highlighting and conceal are on.
+- Preview (opt-in): set `preview_key` and run `setup`; that key toggles a read-only rendered view of the same
+  note in its own pane (open / focus / close, like the notes pane). It uses [glow](https://github.com/charmbracelet/glow)
+  and redraws within a second when the file changes. Without glow it opens the editor read-only instead.
+  Output taller than the pane scrolls off the top; use the pane's scrollback.
 
 ### Agents
 
@@ -69,10 +73,12 @@ editor = "vim"           # default: $EDITOR, then vim; auto-reload/autosave only
 key = "prefix+shift+n"   # used by `setup`
 notes_dir = "~/notes"    # fallback dir without a Claude session, and the tab memory for carry-over
 new_session = "blank"    # "blank" or "carry"
+preview_key = "prefix+n"  # used by `setup`; no preview key is bound unless set
+viewer = "glow"          # preview renderer; if glow is missing, or set to another command, that runs read-only
 ```
 
 Each setting can also be set with an environment variable, which wins over the file:
-`HERDR_NOTES_WIDTH`, `HERDR_NOTES_EDITOR`, `HERDR_NOTES_KEY`, `HERDR_NOTES_DIR`, `HERDR_NOTES_NEW_SESSION`.
+`HERDR_NOTES_WIDTH`, `HERDR_NOTES_EDITOR`, `HERDR_NOTES_KEY`, `HERDR_NOTES_DIR`, `HERDR_NOTES_NEW_SESSION`, `HERDR_NOTES_PREVIEW_KEY`, `HERDR_NOTES_VIEWER`.
 An invalid value is ignored with a message in the plugin log.
 
 ## Development

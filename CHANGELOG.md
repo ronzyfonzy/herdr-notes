@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.0
+- `preview` action: a read-only rendered view of the tab's note in its own pane, toggled like the notes pane. Rendered with glow, redrawn when the file changes; falls back to the editor (read-only) when glow is not installed.
+- `preview_key` binds it via `setup` (opt-in, never overwrites an occupied key); `viewer` picks the renderer.
+
 ## 0.3.0
 - `herdr-notes read | append | path` commands for agents; `herdr-notes-path` kept as an alias. `setup` now installs them as small wrapper scripts, so they keep working across plugin updates once `setup` is re-run.
 - Claude Code skill (`skills/notes`) linked by `setup`, replacing the manual CLAUDE.md snippet.

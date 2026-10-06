@@ -6,11 +6,14 @@
     key = "prefix+shift+n"  # used by `setup`
     notes_dir = "~/notes"   # fallback dir when there is no Claude session, and tab memory
     new_session = "blank"   # "blank" | "carry": what a new Claude session in the same tab starts with
+    preview_key = "prefix+n"  # used by `setup`; no preview key is bound unless set
+    viewer = "glow"         # preview renderer; without glow it falls back to the editor, read-only
 """
 import os, re, shlex, sys
 
 MAP = {"width": "HERDR_NOTES_WIDTH", "editor": "HERDR_NOTES_EDITOR", "key": "HERDR_NOTES_KEY",
-       "notes_dir": "HERDR_NOTES_DIR", "new_session": "HERDR_NOTES_NEW_SESSION"}
+       "notes_dir": "HERDR_NOTES_DIR", "new_session": "HERDR_NOTES_NEW_SESSION",
+       "preview_key": "HERDR_NOTES_PREVIEW_KEY", "viewer": "HERDR_NOTES_VIEWER"}
 d = os.environ.get("HERDR_PLUGIN_CONFIG_DIR") or os.path.expanduser("~/.config/herdr/plugins/config/ronzyfonzy.herdr-notes")
 path = os.path.join(d, "config.toml")
 try:

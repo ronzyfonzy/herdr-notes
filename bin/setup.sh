@@ -14,6 +14,7 @@ pid = os.environ.get("HERDR_PLUGIN_ID", "ronzyfonzy.herdr-notes")
 root = os.environ["HERDR_PLUGIN_ROOT"]
 cfg = os.environ.get("HERDR_NOTES_CONFIG") or os.path.expanduser("~/.config/herdr/config.toml")
 key = os.environ.get("HERDR_NOTES_KEY", "prefix+shift+n")
+pkey = os.environ.get("HERDR_NOTES_PREVIEW_KEY")  # preview is opt-in
 bindir = os.path.expanduser("~/.local/bin")
 notes_sh = os.path.join(root, "bin", "notes.sh")
 MARK = "# managed by ronzyfonzy.herdr-notes setup"
@@ -32,6 +33,10 @@ if mode == "install":
     if occupied:
         msgs.append(f"key {key} is already bound in {cfg}; left untouched (set HERDR_NOTES_KEY to another key)")
     else:
+        if pkey and any(re.search(rf"""["']{re.escape(pkey)}["']""", l)
+                        for l in rest.splitlines() if not l.lstrip().startswith("#")):
+            msgs.append(f"key {pkey} is already bound in {cfg}; preview left unbound (set preview_key to another key)")
+            pkey = None
         if text and not os.path.exists(cfg + ".herdr-notes-backup"):
             shutil.copy(cfg, cfg + ".herdr-notes-backup")
         new = rest.rstrip("\n") + f'''
@@ -42,11 +47,17 @@ key = "{key}"
 type = "plugin_action"
 command = "{pid}.toggle"
 description = "notes: toggle side pane"
-# END {pid}
+''' + (f'''
+[[keys.command]]
+key = "{pkey}"
+type = "plugin_action"
+command = "{pid}.preview"
+description = "notes: toggle rendered preview"
+''' if pkey else "") + f'''# END {pid}
 '''
         os.makedirs(os.path.dirname(cfg), exist_ok=True)
         open(cfg, "w").write(new)
-        msgs.append(f"bound {key} -> {pid}.toggle")
+        msgs.append(f"bound {key} -> {pid}.toggle" + (f", {pkey} -> {pid}.preview" if pkey else ""))
     os.makedirs(bindir, exist_ok=True)
     for name, body in wrappers.items():
         w = os.path.join(bindir, name)

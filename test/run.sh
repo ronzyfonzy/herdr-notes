@@ -96,6 +96,9 @@ check "preview: passes mode to the pane" yes "$(called 'HERDR_NOTES_MODE=preview
 check "preview: own state file"          "w1:pNEW|no" "$(cat "$pst")|$([ -e "$st" ] && echo yes || echo no)"
 (STUB_EXISTS=1; STUB_LABEL=notes-preview; STUB_FOCUSED=true; export STUB_EXISTS STUB_LABEL STUB_FOCUSED; ptoggle)
 check "preview: focused -> closes"       yes "$(called 'pane close w1:pNEW')"
+echo w1:pNEW > "$pst"
+(STUB_EXISTS=1; STUB_LABEL=notes-preview; STUB_FOCUSED=false; export STUB_EXISTS STUB_LABEL STUB_FOCUSED; ptoggle)
+check "preview: unfocused -> closes, no focus" "yes|no" "$(called 'pane close w1:pNEW')|$(called 'pane zoom')"
 (STUB_EXISTS=1; STUB_LABEL=notes; STUB_FOCUSED=false; export STUB_EXISTS STUB_LABEL STUB_FOCUSED; ptoggle)
 check "preview: notes pane is not a preview pane" yes "$(called 'pane split')"
 rm -f "$pst"

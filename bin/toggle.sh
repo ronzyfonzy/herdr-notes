@@ -1,5 +1,5 @@
 #!/bin/sh
-# toggle.sh [preview] — toggle this tab's notes pane (or, with `preview`, its rendered preview pane): open (docked right) / focus if open elsewhere / close if focused.
+# toggle.sh [preview] — toggle this tab's notes pane (or, with `preview`, its rendered preview pane, which any press closes): open (docked right) / focus if open elsewhere / close if focused.
 # A stored pane only counts if herdr still reports it with our label, so a stale id is never closed or focused.
 here=$(cd "$(dirname "$0")" && pwd)
 . "$here/need.sh"; need python3
@@ -38,7 +38,8 @@ if [ -s "$state" ]; then
 fi
 case $status in
   focused)   rm -f "$state"; close_pane "$id"; exit 0 ;;
-  unfocused) focus "$id"; exit 0 ;;
+  unfocused) [ "$mode" = preview ] && { rm -f "$state"; close_pane "$id"; exit 0; } # preview: any press closes
+             focus "$id"; exit 0 ;;
 esac
 rm -f "$state"
 

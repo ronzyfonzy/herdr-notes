@@ -16,7 +16,7 @@ if [ "$preview" = 1 ] && [ "$v" = glow ] && command -v glow >/dev/null 2>&1; the
     cur=$(stat -f %m "$f" 2>/dev/null || stat -c %Y "$f" 2>/dev/null)-$(tput cols)x$(tput lines)
     if [ "$cur" != "$last" ]; then
       last=$cur
-      printf '\033[H\033[2J'
+      printf '\033[H\033[2J\033[3J'
       glow -s "${GLOW_STYLE:-auto}" -w "$(tput cols)" "$f" 2>&1 | cat
     fi
     sleep 1

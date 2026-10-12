@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.4.2
+- Preview no longer piles up stale copies in scrollback when the note is taller than the pane: each redraw now clears scrollback too.
+
 ## 0.4.1
 - The preview key now closes the preview pane whether or not it is focused (it no longer re-focuses it).
 
